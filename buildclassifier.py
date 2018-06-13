@@ -125,7 +125,7 @@ def userinputprediction(google, clf):
 # reads file
 print('Reading data from file...')
 
-data = readdata('training_data') # path to data file
+data = readdata('new_training_data') # path to data file
 X = data[0] # bigram phrases
 y = data[1] # labels( 0s and 1s)
 features = []
