@@ -12,8 +12,8 @@ The project runs in Python3.
 # Files included
 sounds.py (not used, but shows how training examples were discovered) <br/>
 buildclassifier.py <br/>
-newXy <br/>
-4_word_phrases (this is the raw list of 4-word phrases obtained from the regex pattern - around 18000 matches)
+old_training_data <br/>
+new_training_data
 
 # Files not included (must download)
 Google's pretrained word2vec represantations model (found here: https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit
