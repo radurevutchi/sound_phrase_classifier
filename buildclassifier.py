@@ -6,7 +6,6 @@ from gensim.scripts.glove2word2vec import glove2word2vec
 import pickle
 
 
-nltk.download('averaged_perceptron_tagger')
 
 if len(sys.argv) != 3:
     sys.exit('Wrong number of arguments - ERROR')
