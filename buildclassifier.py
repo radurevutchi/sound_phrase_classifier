@@ -3,6 +3,8 @@ import numpy as np
 from sklearn import svm
 import random, nltk, sys, os
 from gensim.scripts.glove2word2vec import glove2word2vec
+import pickle
+
 
 if len(sys.argv) != 3:
     sys.exit('Wrong number of arguments - ERROR')
@@ -298,6 +300,7 @@ print()
 # Value of C found using optunity library
 clf = svm.LinearSVC(C=10 ** -1.7716676259261839, dual=False)
 clf.fit(features, y)
+pickle.dumps(clf)
 
 # Accuracy run on training data and on test data
 printaccuracy(google, clf, X, y, text='Training Set')
