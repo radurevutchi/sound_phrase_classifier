@@ -4,7 +4,7 @@ from sklearn import svm
 import random, nltk, sys, os
 from gensim.scripts.glove2word2vec import glove2word2vec
 
-nltk.download('all')
+nltk.download('averaged_perceptron_tagger')
 
 if len(sys.argv) != 3:
     sys.exit('Wrong number of arguments - ERROR')
