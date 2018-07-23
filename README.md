@@ -35,5 +35,10 @@ string (for sounds.py) <br/>
 3. Run gzip -d on google's pretrained model file to turn it into a .bin file
 4. Add path to the word2vec model in buildclassifier.py
 5. Install dependencies numpy, sklearn, gensim
-6. run: python3 buildclassifier.py
+
+6. For GloVe embeddings run:
+    python3 buildclassifier.py glove <embeddings_filename>
+   For word2vec embeddings run:
+    python3 buildclassifier.py word2vec <embeddings_filename>
+    
 7. Input unigram or bigram phrases to test prediction
