@@ -17,7 +17,8 @@ new_training_data
 
 # Files not included (must download)
 Google's pretrained word2vec represantations model (found here: https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit
-)
+)<br/>
+Stanford's GloVe pretrained vectors (found here: https://nlp.stanford.edu/projects/glove/)
 
 # Dependencies and Libraries
 numpy (pip3 install -U numpy) <br/>
