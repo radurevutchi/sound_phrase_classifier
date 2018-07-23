@@ -171,7 +171,7 @@ def readdata(directory):
 
     for a in range(2,len(cleandata),3):
         y.append(int(cleandata[a]))
-
+nltk.download('averaged_perceptron_tagger')
     for a in range(0,len(cleandata),3):
         X.append(cleandata[a] + ' ' + cleandata[a+1])
 
@@ -222,6 +222,7 @@ print('Loading pretrained vector representations...')
 
 # model which converts words to word2vec representations
 
+nltk.download('averaged_perceptron_tagger')
 
 if glove:
     if os.path.isfile(model_filename + '.word2vec'):
