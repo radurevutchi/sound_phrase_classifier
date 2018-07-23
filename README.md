@@ -36,9 +36,9 @@ string (for sounds.py) <br/>
 4. Add path to the word2vec model in buildclassifier.py
 5. Install dependencies numpy, sklearn, gensim
 
-6. For GloVe embeddings run:
-    python3 buildclassifier.py glove <embeddings_filename>
-   For word2vec embeddings run:
+6. For GloVe embeddings run:<br/>
+    python3 buildclassifier.py glove <embeddings_filename><br/>
+   For word2vec embeddings run:<br/>
     python3 buildclassifier.py word2vec <embeddings_filename>
     
 7. Input unigram or bigram phrases to test prediction
