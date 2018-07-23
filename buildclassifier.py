@@ -1,16 +1,97 @@
 from gensim.models import KeyedVectors
 import numpy as np
 from sklearn import svm
-import random
+import random, nltk, sys, os
+from gensim.scripts.glove2word2vec import glove2word2vec
+
+if len(sys.argv) != 3:
+    sys.exit('Wrong number of arguments - ERROR')
+else:
+    if sys.argv[1] == 'glove':
+        glove = True
+    elif sys.argv[1] == 'word2vec':
+        glove = False
+    else:
+        sys.exit("ERROR")
+
+model_filename = sys.argv[2]
+
 
 
 
 # HELPER FUNCTIONS
 
+def POSpatterns(tagged):
+
+    if not tagged:
+        return False
+
+    justtags = map(lambda x: x[1], tagged)
+    justtags = list(justtags)
+
+
+    if len(justtags) == 1:
+        if justtags[0] == 'VBG':
+            return True
+        elif justtags[0] == 'NN' or justtags[0] == 'NNS':
+            return True
+        else:
+            return False
+
+    assert(len(justtags) > 1)
+    if justtags[0] == 'VBG':
+        if justtags[1] == 'NN' or justtags[1] == 'NNS':
+            return True #(DT) VBG NN(S)
+        else:
+            return False # VBG
+
+    elif justtags[0] == 'NN' or justtags[0] == 'NNS':
+        if (justtags[1] =='NN' or justtags[1] == 'NNS') and justtags[0] == 'NN':
+            return True # (DT) NN NN(S)
+        elif justtags[1] == 'VBG':
+            return True # (DT) NN(S) VBG
+        else:
+            return False # (DT) NN(S)
+
+    elif justtags[0] == 'JJ':
+        if justtags[1] =='NN' or justtags[1] == 'NNS':
+            return True # (DT) JJ NN(S)
+
+    return False # did not match
+
+
+def POStagger(phrase):
+
+    splitphrase = nltk.word_tokenize(phrase)
+    tagged = nltk.pos_tag(splitphrase)
+
+    if tagged[0][1] == 'DT':
+        tagged.pop(0)
+
+    return POSpatterns(tagged)
+
 
 # takes in bigram or unigram and returns whether it is a sound
 def prediction(model, classifier, phrase):
+
+    haha = False
+    if phrase == 'yelling' or phrase == 'yelling yelling':
+        haha = True
+    if haha: print('1')
+    if POStagger(phrase) == False:
+        return [0]
+    if haha: print('2')
+    words = phrase.split()
+    splitphrase = nltk.word_tokenize(phrase)
+    tagged = nltk.pos_tag(splitphrase)
+
+    if tagged[0][1] == 'DT':
+        words.pop(0)
+    phrase = ' '.join(words)
+
+
     phrases = phrase.split()
+    if haha: print(phrases)
     try:
         if len(phrases) == 2:
             a = model[phrases[0]] # 300 dimensional vector
@@ -119,6 +200,7 @@ def userinputprediction(google, clf):
 
 
 
+
 # MAIN CODE
 
 
@@ -136,10 +218,20 @@ assert(len(X) == len(y))
 
 
 
-print('Loading pretrained word2vec representations...')
+print('Loading pretrained vector representations...')
 
 # model which converts words to word2vec representations
-google = KeyedVectors.load_word2vec_format('./google.bin', binary=True)
+
+
+if glove:
+    if os.path.isfile(model_filename + '.word2vec'):
+        google = KeyedVectors.load_word2vec_format(filename,binary=False)
+    else:
+        glove2word2vec(model_filename, model_filename + '.word2vec')
+        filename = model_filename + '.word2vec'
+        google = KeyedVectors.load_word2vec_format(filename,binary=False)
+else:
+    google = KeyedVectors.load_word2vec_format(model_filename, binary=True)
 
 
 
@@ -147,7 +239,9 @@ google = KeyedVectors.load_word2vec_format('./google.bin', binary=True)
 
 
 
-print('Transforming phrases into word2vec vectors...')
+
+
+print('Transforming phrases into vectors...')
 
 failed = 0 # phrases for which google doesn't have a word2vec representation
 for phrase in range(len(X)-1, -1, -1):
