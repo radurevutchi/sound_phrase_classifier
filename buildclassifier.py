@@ -3,6 +3,8 @@ import numpy as np
 from sklearn import svm
 import random, nltk, sys, os
 from gensim.scripts.glove2word2vec import glove2word2vec
+import pickle
+
 
 nltk.download('averaged_perceptron_tagger')
 
@@ -173,7 +175,7 @@ def readdata(directory):
 
     for a in range(2,len(cleandata),3):
         y.append(int(cleandata[a]))
-
+nltk.download('averaged_perceptron_tagger')
     for a in range(0,len(cleandata),3):
         X.append(cleandata[a] + ' ' + cleandata[a+1])
 
@@ -224,6 +226,7 @@ print('Loading pretrained vector representations...')
 
 # model which converts words to word2vec representations
 
+nltk.download('averaged_perceptron_tagger')
 
 if glove:
     if os.path.isfile(model_filename + '.word2vec'):
@@ -299,6 +302,7 @@ print()
 # Value of C found using optunity library
 clf = svm.LinearSVC(C=10 ** -1.7716676259261839, dual=False)
 clf.fit(features, y)
+pickle.dumps(clf)
 
 # Accuracy run on training data and on test data
 printaccuracy(google, clf, X, y, text='Training Set')
