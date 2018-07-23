@@ -5,7 +5,7 @@ Classifies sound phrases from large scale corpora using NLP, POS tagging, and SV
 This project is a replication of the experiments conducted in Section 2 of the paper:
 "Discovering sound concepts and acoustic relations in text" found on IEEE Xplore
 
-The project processes large scale text corpora and uses regular expressions and POS tagging to classify sound phrases. I then manually labeled around 3000 sound phrases obtained previously into sound or non-sound classification. The resulting was used to train an SVM with an RBF kernel to produce a sound phrase vs non-sound phrase classifier.
+The project processes large scale text corpora and uses regular expressions and POS tagging to classify sound phrases. I then manually labeled around 3000 sound phrases obtained previously into sound or non-sound classification. The resulting was used to train a Linear SVM to produce a sound phrase vs non-sound phrase classifier.
 
 The project runs in Python3.
 
