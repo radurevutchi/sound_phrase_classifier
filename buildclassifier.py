@@ -225,11 +225,11 @@ print('Loading pretrained vector representations...')
 
 if glove:
     if os.path.isfile(model_filename + '.word2vec'):
-        google = KeyedVectors.load_word2vec_format(filename,binary=False)
+        google = KeyedVectors.load_word2vec_format(model_filename,binary=False)
     else:
         glove2word2vec(model_filename, model_filename + '.word2vec')
         filename = model_filename + '.word2vec'
-        google = KeyedVectors.load_word2vec_format(filename,binary=False)
+        google = KeyedVectors.load_word2vec_format(model_filename,binary=False)
 else:
     google = KeyedVectors.load_word2vec_format(model_filename, binary=True)
 
