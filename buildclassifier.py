@@ -1,3 +1,4 @@
+from __future__ import division
 from gensim.models import KeyedVectors
 import numpy as np
 from sklearn import svm
