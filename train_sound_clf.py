@@ -19,7 +19,7 @@ def vectorify(data, vector_model):
     for example in data:
         if example:
             #print(example)
-            example = example.split(' , ')
+            example = example.split(',')
             #print(example)
             sound = example[0].split()
             correct = example[1]
