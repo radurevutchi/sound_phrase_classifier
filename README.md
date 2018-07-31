@@ -17,9 +17,10 @@ run_sound_clf.py<br/>
 training_data<br/>
 <br/>
 Additional Files:<br/>
-Sample training data file<br/>
-Sample classifier model<br/>
-Sample input for run_sound_clf<br/>
+training_data (training data for train_sound_clf.py)<br/>
+clf1.model (classifier model trained on word2vec 300d vectors)<br/>
+sample_document (input for run_sound_clf.py when set to "true"<br/>
+sample_list (input  for run_sound_clf.py when set to "false"<br/>
 
 # Files not included (must download)
 Google's pretrained word2vec represantations model (found here: https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit
@@ -54,4 +55,4 @@ This will process the document(or list) and output a list (results.txt) of filte
 <br/>
 <br/>
 
-IMPORTANT: A classifier may be trained on glove or word2vec embeddings only.
+IMPORTANT: A classifier may be trained on glove or word2vec embeddings only. Additionally, the input files for training_data and sample_list (when run_sound_clf.py set to 'false') must match the format given in the examples files.
