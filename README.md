@@ -19,8 +19,9 @@ training_data<br/>
 Additional Files:<br/>
 training_data (training data for train_sound_clf.py)<br/>
 clf1.model (classifier model trained on word2vec 300d vectors)<br/>
-sample_document (input for run_sound_clf.py when set to "true"<br/>
-sample_list (input  for run_sound_clf.py when set to "false"<br/>
+sample_document (input for run_sound_clf.py when set to "true")<br/>
+sample_list (input  for run_sound_clf.py when set to "false")<br/>
+results.txt (output from run_sound_clf.py when input is sample_list)<br/>
 
 # Files not included (must download)
 Google's pretrained word2vec represantations model (found here: https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit
