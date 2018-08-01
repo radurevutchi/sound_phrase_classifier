@@ -3,7 +3,6 @@ import numpy as np
 from sklearn import svm
 import sys, os
 from gensim.scripts.glove2word2vec import glove2word2vec
-from sklearn.externals import joblib
 import optunity
 import optunity.metrics
 import pickle
@@ -12,33 +11,55 @@ import pickle
 
 
 
-def vectorify(data, vector_model):
+def vectorify(data, vector_model, glove):
     temp_X = []
     temp_y = []
     vectors = []
+
+    # goes through all training/testing examples
     for example in data:
+
+        #makes sure dataline is not empty
         if example:
-            #print(example)
             example = example.split(',')
-            #print(example)
             sound = example[0].split()
             correct = example[1]
-        try:
-            if len(sound) == 2:
-                one = vector_model[sound[0]]
-                two = vector_model[sound[1]]
-            else:
-                one = vector_model[sound[0]]
-                two = vector_model[sound[0]]
-            one = list(one)
-            two = list(two)
-            vector = one + two
-            sound = ' '.join(sound)
-            temp_y.append(int(correct))
-            temp_X.append(sound)
-            vectors.append(vector)
-        except:
-            pass
+
+            if len(sound) == 1:
+                sound += sound
+            assert(len(sound) == 2)
+
+
+            # Makes lowercase
+            if sound[0] not in vector_model:
+                sound[0] = sound[0].lower()
+            if sound[1] not in vector_model:
+                sound[1] = sound[1].lower()
+
+
+            #Makes sure at least one word is found in embeddings vector dict
+            if sound[0] in vector_model or sound[1] in vector_model:
+                if sound[0] in vector_model:
+                    one = vector_model[sound[0]]
+
+                #unknown word handling
+                else:
+                    one = vector_model['unk']
+
+                if sound[1] in vector_model:
+                    two = vector_model[sound[1]]
+
+                #unknown word handling
+                else:
+                    two = vector_model['unk']
+
+                #concatenates vectors together
+                vector = list(one) + list(two)
+                sound = ' '.join(sound)
+                temp_y.append(int(correct))
+                temp_X.append(sound)
+                vectors.append(vector)
+
 
     return(temp_X, temp_y, vectors)
 
@@ -70,6 +91,7 @@ training_filename = sys.argv[3]
 print("Loading vector embeddings...")
 if glove:
     if os.path.isfile(vectors_filename+'.word2vec'):
+        print('good')
         vector_model = KeyedVectors.load_word2vec_format(vectors_filename+'.word2vec',binary=False)
     else:
         glove2word2vec(vectors_filename, vectors_filename+'.word2vec')
@@ -87,7 +109,7 @@ print("Processing test data...")
 test = open(training_filename,'r')
 data = test.read().split('\n')
 
-(X, y, vectors) = vectorify(data, vector_model)
+(X, y, vectors) = vectorify(data, vector_model, glove)
 assert(len(X) == len(y) and len(X) == len(vectors))
 
 
