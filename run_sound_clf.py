@@ -4,94 +4,178 @@ from sklearn import svm
 import random, nltk, sys, os, re
 from gensim.scripts.glove2word2vec import glove2word2vec
 from sklearn.externals import joblib
+import pickle
 
 
+def find_vector(sound, vector_model):
+
+    sound = sound.split()
+    assert(len(sound) == 1 or len(sound) == 2)
+
+    if len(sound) == 1:
+        if sound[0] in vector_model:
+            result = vector_model[sound[0]]
+            result = list(result)
+            result += result
+        elif sound[0].lower() in vector_model:
+            result = vector_model[sound[0].lower()]
+            result = list(result)
+            result += result
+        else:
+            result = []
 
 
+    else:
 
-
-
-def process_doc(filename):
-    punctuation = '!"#$%&()*+,-./:;<=>?@[\\]^_{|}~'
-    temp_data = []
-    raw_file = open(filename, 'r')
-    data = ' '.join(raw_file.read().split())
-    findings = re.findall('sounds?\sof\s(\S+?\s\S+?)\s', data)
-
-    for phrase in findings:
-        tokens = nltk.word_tokenize(phrase)
-        tokens = nltk.pos_tag(tokens)
-
-        justtags = map(lambda x: x[1], tokens)
-        justtags = list(justtags)
-
-        if justtags[0] == 'DT':
-            justtags.pop(0)
-
-
-        phraselen = 0
-        if len(justtags) == 1:
-            if justtags[0] == 'VBG':
-                phraselen = 1
-            elif justtags[0] == 'NN' or justtags[0] == 'NNS':
-                phraselen = 1
+        if '_'.join(sound) in vector_model:
+            result = vector_model['_'.join(sound)]
+            result = list(result)
+            result += result
+        elif '_'.join(sound).lower() in vector_model:
+            result = vector_model['_'.join(sound).lower()]
+            result = list(result)
+            result += result
+        elif sound[0] in vector_model or sound[1] in vector_model:
+            if sound[0] in vector_model:
+                one = vector_model[sound[0]]
+            elif sound[0].lower() in vector_model:
+                one = vector_model[sound[0].lower()]
             else:
-                phraselen = 0
+                one = vector_model['unk']
+            if sound[1] in vector_model:
+                two = vector_model[sound[1]]
+            elif sound[1].lower() in vector_model:
+                two = vector_model[sound[1].lower()]
+            else:
+                two = vector_model['unk']
+            one = list(one)
+            two = list(two)
+            result = one + two
+        else:
+            result = []
 
-        assert(len(justtags) > 1)
+
+    return result
+
+
+def process_POS(sound):
+    punctuation = '!"#$%&()*+,-./:;<=>?@[\\]^_{|}~'
+
+    tokens = nltk.word_tokenize(sound)
+    tokens = nltk.pos_tag(tokens)
+
+    justtags = map(lambda x: x[1], tokens)
+    justtags = list(justtags)
+
+    phraselen = 0
+
+    #unigram was given as input
+    if len(justtags) == 1:
+        if justtags[0] == 'VBG':
+            phraselen = 1
+        elif justtags[0] == 'NN' or justtags[0] == 'NNS':
+            phraselen = 1
+
+
+
+    #bigram was given as input
+    else:
         if justtags[0] == 'VBG':
             if justtags[1] == 'NN' or justtags[1] == 'NNS':
                 phraselen = 2 #(DT) VBG NN(S)
-            else:
-                phraselen = 1 # VBG
 
         elif justtags[0] == 'NN' or justtags[0] == 'NNS':
             if (justtags[1] =='NN' or justtags[1] == 'NNS') and justtags[0] == 'NN':
                 phraselen = 2 # (DT) NN NN(S)
             elif justtags[1] == 'VBG':
                 phraselen = 2 # (DT) NN(S) VBG
-            else:
-                phraselen = 1 # (DT) NN(S)
 
         elif justtags[0] == 'JJ':
             if justtags[1] =='NN' or justtags[1] == 'NNS':
                 phraselen = 2 # (DT) JJ NN(S)
-        else:
-            phraselen = 0 # did not match
-
-        if phraselen != 0:
-            phrase = ' '.join(phrase.split()[:phraselen])
-            translator = str.maketrans('','',punctuation)
-            phrase = phrase.translate(translator)
-            temp_data.append(phrase)
-
-    return temp_data
 
 
 
-def vectorify(data, vector_model):
+    sound = ' '.join(sound.split()[:phraselen])
+    translator = str.maketrans('','',punctuation)
+    sound = sound.translate(translator)
+
+    return sound
+
+
+
+
+def process_doc(filename):
+    temp_data = []
+    raw_file = open(filename, 'r')
+    data = ' '.join(raw_file.read().split())
+    findings = re.findall('sounds?\sof\s(\S+?\s\S+?)\s', data)
+
+    return findings
+
+
+
+def vectorify(data, vector_model, clf):
     temp_data = []
     vectors = []
-    for sound in data:
-        sound = sound.split()
-        try:
-            if len(sound) == 2:
-                one = vector_model[sound[0]]
-                two = vector_model[sound[1]]
-            else:
-                one = vector_model[sound[0]]
-                two = vector_model[sound[0]]
-            one = list(one)
-            two = list(two)
-            vector = one + two
-            sound = ' '.join(sound)
-            temp_data.append(sound)
-            vectors.append(vector)
-        except:
-            pass
+    scores = []
+    bigrams = []
+    unigrams = []
 
-    print(temp_data)
-    return(temp_data, vectors)
+    count = 0
+    a = open(data, 'r')
+    example = a.readline()[:-1]
+    # goes through all training/testing examples
+    while example:
+        print(count)
+
+        #makes sure dataline is not empty
+        if example:
+            example = example.split()
+
+
+            #bigram checking
+
+            if len(example) > 1:
+                for i in range(len(example)-1):
+                    sound = process_POS(' '.join(example[i:i+1]))
+                    if sound: bigrams.append(sound)
+
+            #unigram checking
+            for word in example:
+                sound = process_POS(word)
+                if sound: unigrams.append(sound)
+
+
+
+
+            # Makes lowercase
+            for bigram in bigrams:
+                vector = find_vector(bigram, vector_model)
+                if vector: vectors.append(vector)
+
+
+            for unigram in unigrams:
+                vector = find_vector(unigram, vector_model)
+                if vector: vectors.append(vector)
+
+
+
+            if vectors:
+                confidence = clf.decision_function(vectors)
+                max_confidence = max(confidence)
+                if max_confidence > 0:
+                    example = ' '.join(example)
+                    temp_data.append(example)
+                    scores.append(max_confidence)
+        count += 1
+        example = a.readline()[:-1]
+        vectors = []
+        bigrams = []
+        unigrams = []
+
+
+    return(temp_data, scores)
 
 
 
@@ -142,7 +226,7 @@ else:
 
 # Loads the SVM classifier from file
 print("Loading SVM sound classifier...")
-clf = joblib.load(clf_filename)
+clf = pickle.load(open(clf_filename, 'rb'))
 
 
 
@@ -157,18 +241,15 @@ else:
 
 
 
-(data,vectors) = vectorify(data, vector_model)
-num_sounds = len(data)
-predictions = clf.predict(vectors)
-confidence = clf.decision_function(vectors)
-finalsounds = []
+(data,scores) = vectorify(test_filename, vector_model, clf)
 
-assert(len(confidence) == len(predictions))
+assert(len(data) == len(scores))
+
+
 output_filename = 'results.txt'
 output = open(output_filename, 'w')
-for index in range(num_sounds):
-    if predictions[index]:
-        output.write(data[index] + ',' + str(confidence[index]) + '\n')
+for index in range(len(data)):
+    output.write(data[index] + ',' + str(scores[index]) + '\n')
 
 output.close()
 
