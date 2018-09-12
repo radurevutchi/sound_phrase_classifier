@@ -1,5 +1,5 @@
 # sound_phrase_classifier
-Classifies sound phrases from large scale corpora using NLP, POS tagging, and SVMs.
+Classifies sound phrases from large scale corpora using NLP, POS tagging, Word Embeddings, and SVMs.
 
 # Description
 This project is a replication of the experiments conducted in Section 2 of the paper:
